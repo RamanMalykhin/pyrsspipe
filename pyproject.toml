@@ -1,0 +1,21 @@
+# FILEPATH: /c:/Users/raman/Documents/Programming/rss_toolkit/pyrsspipe/pyproject.toml
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "pyrsspipe"
+version = "0.1.0"
+description = "A toolkit for working with RSS feeds"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.26.0"
+beautifulsoup4 = "^4.10.0"
+feedparser = "6.0.10"
+boto3 = "^1.34.14"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
