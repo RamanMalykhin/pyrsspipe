@@ -4,7 +4,7 @@ import logging
 import logging
 from importlib import import_module
 
-from out.out import out_wrapper
+from output.out import out_wrapper
 import os
 
 # Initialize logger
