@@ -4,7 +4,8 @@ import logging
 import logging
 from importlib import import_module
 
-from output.out import out_wrapper
+from validation import validate_feed_data
+from makefeed import make_feed_wrapper
 import os
 
 # Initialize logger
@@ -42,7 +43,11 @@ try:
         'items_data': feed_items
     }
 
-    out_wrapper(feed_data, logger=logging, **config['out'])
+    try:
+        validate_feed_data(feed_data)
+    except ValueError as e:
+        logging.error(f'invalid feed_data: {e}')
+        raise e
 
     logging.info('output complete')
     logging.info('pyrsspipe complete') 
