@@ -29,7 +29,7 @@ try:
     logging.info(f'parsed config {config_name}')
 
     in_module = config['in']['module']
-    in_module = import_module(f"in.{in_module}")
+    in_module = import_module(f"input.{in_module}")
     in_function = getattr(in_module, 'get_feed_items')
         
     logging.info(f'imported in module {in_module}, using in function {in_function}')
@@ -48,8 +48,18 @@ try:
     except ValueError as e:
         logging.error(f'invalid feed_data: {e}')
         raise e
+    
+    feed_xml = make_feed_wrapper(feed_data)
+    logging.info('feed_xml created')
 
+    out_module = config['out']['module']
+    out_module = import_module(f"output.{out_module}")
+    out_function = getattr(out_module, 'write_feed')
+    logging.info(f'imported out module {out_module}, using out function {out_function}')
+
+    out_function(feed_xml, **config['out']['args'], logger=logging)
     logging.info('output complete')
+    
     logging.info('pyrsspipe complete') 
 
 except Exception as e:

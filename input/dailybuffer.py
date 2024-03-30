@@ -2,7 +2,7 @@ import feedparser
 import datetime
 
 
-def get_feed_items(input_feed_link, s3_url):
+def get_feed_items(input_feed_link):
     input_feed = feedparser.parse(input_feed_link)
     feed_entries = input_feed['entries']
     feed_entries.reverse()
@@ -18,11 +18,8 @@ def get_feed_items(input_feed_link, s3_url):
         
         dateagg_dict.setdefault(agg_date, []).append(entry_content)
 
-    output_feed_data = []
     for agg_date, entries in dateagg_dict.items():
         output_feed_item = {}
-        title = agg_date+'.html'
-
         aggregated_entries_html = "<html>" + \
                 " <head> <meta charset = \"UTF-8\">" + \
                 "<title>" + agg_date+ "</title>" + \
@@ -32,7 +29,7 @@ def get_feed_items(input_feed_link, s3_url):
         
         description = aggregated_entries_html[0:200]+'...'
         key =  agg_date+'.html'
-        link = s3_url + key
+        link = input_feed_link
 
         output_feed_item['title'] = agg_date
         output_feed_item['description'] = description
@@ -40,3 +37,5 @@ def get_feed_items(input_feed_link, s3_url):
         output_feed_item['link'] = link
 
         output_feed_entries.append(output_feed_item)
+    
+    return output_feed_entries

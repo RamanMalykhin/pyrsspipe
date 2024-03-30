@@ -31,7 +31,9 @@ def _make_rfeed_feed(feed_items, feed_link, feed_name, feed_language):
     return feed
 
 
-def make_feed_wrapper(feed_data, output_feed_link):
+def make_feed_wrapper(feed_data, feed_link=None):
+        if not feed_link:
+            feed_link = 'http://example.com'
         feed_data_items = feed_data['items_data']
         
         feed_items = []
@@ -39,7 +41,7 @@ def make_feed_wrapper(feed_data, output_feed_link):
             feed_item = _make_rfeed_item(feed_data_item['link'], feed_data_item['description'], author=feed_data_item.get('author'), title=feed_data_item.get('title'))
             feed_items.append(feed_item)
 
-        feed = _make_rfeed_feed(feed_items=feed_items, feed_link=output_feed_link, feed_name=feed_data['feed_name'], feed_language=feed_data['feed_language'])
+        feed = _make_rfeed_feed(feed_items=feed_items, feed_link=feed_link, feed_name=feed_data['feed_name'], feed_language=feed_data['feed_language'])
         
         feed_xml = feed.rss()
 
