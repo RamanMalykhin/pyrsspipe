@@ -1,11 +1,10 @@
 import json
 import argparse
 import logging
-import logging
 from importlib import import_module
 
-from validation import validate_feed_data
-from makefeed import make_feed_wrapper
+from pyrsspipe.validation import validate_feed_data
+from pyrsspipe.makefeed import make_feed_wrapper
 import os
 
 CONFIG_DIR = os.getenv('PRP_CONFIG_DIR_PATH')

@@ -1,5 +1,4 @@
 import requests
-import re
 from discord_markdown.discord_markdown import convert_to_html
 import os 
 import contextlib

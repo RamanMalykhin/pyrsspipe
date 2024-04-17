@@ -1,5 +1,6 @@
+import feedparser
+
 def get_feed_items(feed_link, which_archive, logger):
-    import feedparser
     
     if which_archive == 'archive.today':
         substitute = 'https://archive.is/'
