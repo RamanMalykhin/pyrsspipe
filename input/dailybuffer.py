@@ -27,13 +27,10 @@ def get_feed_items(input_feed_link):
                 "<hr>".join(entries) + \
                 "</body> </html>"
         
-        description = aggregated_entries_html[0:200]+'...'
-        key =  agg_date+'.html'
         link = input_feed_link
 
         output_feed_item['title'] = agg_date
-        output_feed_item['description'] = description
-        output_feed_item['actual_item_content'] = {'key': key, 'html_content': aggregated_entries_html}
+        output_feed_item['description'] = aggregated_entries_html
         output_feed_item['link'] = link
 
         output_feed_entries.append(output_feed_item)
