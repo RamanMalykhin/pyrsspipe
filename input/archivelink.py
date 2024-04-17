@@ -1,10 +1,12 @@
 def get_feed_items(feed_link, which_archive, logger):
     import feedparser
     
-    if which_archive == 'archive.is':
+    if which_archive == 'archive.today':
         substitute = 'https://archive.is/'
-    elif which_archive == 'archive.org':
+    elif which_archive == 'Wayback Machine':
         substitute = 'https://web.archive.org/web/'
+    elif which_archive == 'Google Webcache':
+        substitute = 'https://archive.today/'
 
     logger.info(f'parsing {feed_link}')
     ftfeed = feedparser.parse(feed_link)
