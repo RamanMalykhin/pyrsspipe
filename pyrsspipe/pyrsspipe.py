@@ -7,17 +7,17 @@ from importlib import import_module
 from pyrsspipe.makefeed import make_feed_wrapper
 from pyrsspipe.validation import validate_feed_data
 
-PIPECONFIG_DIR = os.getenv("PYRSSPIPE_PIPECONFIG_DIR")
-LOG_DIR = os.getenv("PYRSSPIPE_LOG_DIR")
-
 
 def pyrsspipe():
+    pipeconfig_dir = os.getenv("PYRSSPIPE_PIPECONFIG_DIR")
+    log_dir = os.getenv("PYRSSPIPE_LOG_DIR")
+
     # Initialize logger
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[
-            logging.FileHandler(os.path.join(LOG_DIR, "pyrsspipe.log")),
+            logging.FileHandler(os.path.join(log_dir, "pyrsspipe.log")),
             logging.StreamHandler(),
         ],
     )
@@ -31,13 +31,13 @@ def pyrsspipe():
 
         # Open the pipeconfig file
 
-        pipeconfig_path = f"{PIPECONFIG_DIR}/{pipeconfig_name}.json"
+        pipeconfig_path = f"{pipeconfig_dir}/{pipeconfig_name}.json"
         with open(pipeconfig_path, "r") as file:
             pipeconfig = json.load(file)
         logging.info(f"parsed pipeconfig {pipeconfig_name}")
 
         input_module_name = pipeconfig["input"]["module"]
-        input_module = import_module(f"input.{input_module_name}")
+        input_module = import_module(f"pyrsspipe.input.{input_module_name}")
         input_function = getattr(input_module, "get_feed_items")
 
         logging.info(
@@ -48,7 +48,6 @@ def pyrsspipe():
 
         feed_data = {
             "feed_name": pipeconfig["feed_name"],
-            "feed_filename": pipeconfig["feed_filename"],
             "feed_language": pipeconfig["feed_language"],
             "items_data": feed_items,
         }
@@ -63,7 +62,7 @@ def pyrsspipe():
         logging.info("feed_xml created")
 
         output_module_name = pipeconfig["output"]["module"]
-        output_module = import_module(f"output.{output_module_name}")
+        output_module = import_module(f"pyrsspipe.output.{output_module_name}")
         output_function = getattr(output_module, "write_feed")
         logging.info(
             f"imported output module {output_module}, using output function {output_function}"
