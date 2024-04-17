@@ -49,7 +49,7 @@ PyRSSPipe ships with some `input` and `output` modules that I built for my own u
                 "s3_key": "creator_posts_feed.xml",
                 "aws_access_key_id": "MY_AKEY",
                 "aws_secret_access_key": "MY_SKEY",
-                "endpoint_url": "https://s3.us-east-2.amazonaws.com "
+                "endpoint_url": "https://s3.us-east-2.amazonaws.com"
             }
         }
     }
