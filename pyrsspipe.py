@@ -34,9 +34,9 @@ try:
     input_module = import_module(f"input.{input_module_name}")
     input_function = getattr(input_module, 'get_feed_items')
         
-    logging.info(f'imported in module {input_module}, using in function {input_function}')
+    logging.info(f'imported input module {input_module}, using input function {input_function}')
 
-    feed_items = input_function(**config['in']['args'], logger=logging)
+    feed_items = input_function(**config['input']['args'], logger=logging)
 
     feed_data = {
         'feed_name': config['feed_name'],
@@ -57,9 +57,9 @@ try:
     output_module_name = config['output']['module']
     output_module = import_module(f"output.{output_module_name}")
     output_function = getattr(output_module, 'write_feed')
-    logging.info(f'imported out module {output_function}, using out function {output_function}')
+    logging.info(f'imported output module {output_function}, using output function {output_function}')
 
-    output_function(feed_xml, **config['out']['args'], logger=logging)
+    output_function(feed_xml, **config['output']['args'], logger=logging)
     logging.info('output complete')
     
     logging.info('pyrsspipe complete') 
