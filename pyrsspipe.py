@@ -8,9 +8,12 @@ from validation import validate_feed_data
 from makefeed import make_feed_wrapper
 import os
 
+CONFIG_DIR = os.getenv('PRP_CONFIG_DIR_PATH')
+LOG_DIR = os.getenv('PRP_LOG_DIR_PATH')
+
 # Initialize logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',  handlers=[
-    logging.FileHandler("debug.log"),
+    logging.FileHandler(os.path.join(LOG_DIR, 'pyrsspipe.log')),
     logging.StreamHandler()
 ])
 
@@ -22,10 +25,8 @@ try:
     logging.info(f'using config {config_name}')
 
     # Open the config file
-
-    config_dir = os.getenv('PRP_CONFIG_DIR_PATH') 
     
-    config_path = f'{config_dir}/{config_name}.json'
+    config_path = f'{CONFIG_DIR}/{config_name}.json'
     with open(config_path, 'r') as file:
         config = json.load(file)
     logging.info(f'parsed config {config_name}')
