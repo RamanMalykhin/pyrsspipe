@@ -1,5 +1,8 @@
 import requests
 import re
+from discord_markdown.discord_markdown import convert_to_html
+import os 
+import contextlib
 
 def get_feed_items(token, channel_id, guild_id, logger):
 
@@ -14,10 +17,14 @@ def get_feed_items(token, channel_id, guild_id, logger):
 
     for message in messages:
         feed_item = {}
-        message_link = f"https://discord.com/channels/{guild_id}/{channel_id}/{message['id']}"       
-        message_content_with_fixed_links = re.sub("<(https?://\S+)>"," \n \g<1> \n ",message['content'])
+        message_link = f"https://discord.com/channels/{guild_id}/{channel_id}/{message['id']}"
+
+        with open(os.devnull, 'w') as devnull:
+            with contextlib.redirect_stdout(devnull):
+                message_content = convert_to_html(message['content'])
+
         feed_item['link'] = message_link
-        feed_item['description'] = message_content_with_fixed_links
+        feed_item['description'] = message_content
         feed_items.append(feed_item)
     
     return feed_items
