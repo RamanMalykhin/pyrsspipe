@@ -6,7 +6,7 @@ def validate_feed_data(feed_data: dict):
 
 
 def _validate_feed_data(feed_data):
-    for required in ["feed_language", "feed_name", "feed_filename", "items_data"]:
+    for required in ["feed_language", "feed_name", "items_data"]:
         if required not in feed_data:
             raise ValueError(
                 f"feed_data must contain {required}. feed_data is {feed_data}"
