@@ -28,13 +28,13 @@ try:
         config = json.load(file)
     logging.info(f'parsed config {config_name}')
 
-    in_module = config['in']['module']
-    in_module = import_module(f"input.{in_module}")
-    in_function = getattr(in_module, 'get_feed_items')
+    input_module_name = config['input']['module']
+    input_module = import_module(f"input.{input_module_name}")
+    input_function = getattr(input_module, 'get_feed_items')
         
-    logging.info(f'imported in module {in_module}, using in function {in_function}')
+    logging.info(f'imported in module {input_module}, using in function {input_function}')
 
-    feed_items = in_function(**config['in']['args'], logger=logging)
+    feed_items = input_function(**config['in']['args'], logger=logging)
 
     feed_data = {
         'feed_name': config['feed_name'],
@@ -52,12 +52,12 @@ try:
     feed_xml = make_feed_wrapper(feed_data)
     logging.info('feed_xml created')
 
-    out_module = config['out']['module']
-    out_module = import_module(f"output.{out_module}")
-    out_function = getattr(out_module, 'write_feed')
-    logging.info(f'imported out module {out_module}, using out function {out_function}')
+    output_module_name = config['output']['module']
+    output_module = import_module(f"output.{output_module_name}")
+    output_function = getattr(output_module, 'write_feed')
+    logging.info(f'imported out module {output_function}, using out function {output_function}')
 
-    out_function(feed_xml, **config['out']['args'], logger=logging)
+    output_function(feed_xml, **config['out']['args'], logger=logging)
     logging.info('output complete')
     
     logging.info('pyrsspipe complete') 
