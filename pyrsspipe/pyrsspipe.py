@@ -7,7 +7,7 @@ from importlib import import_module
 from pyrsspipe.makefeed import make_feed_wrapper
 from pyrsspipe.validation import validate_feed_data
 
-CONFIG_DIR = os.getenv("PYRSSPIPE_CONFIG_DIR")
+PIPECONFIG_DIR = os.getenv("PYRSSPIPE_PIPECONFIG_DIR")
 LOG_DIR = os.getenv("PYRSSPIPE_LOG_DIR")
 
 
@@ -24,19 +24,19 @@ def pyrsspipe():
 
     try:
         parser = argparse.ArgumentParser()
-        parser.add_argument("--config", help="Specify the config name", required=True)
+        parser.add_argument("--pipeconfig", help="Specify the pipeconfig name", required=True)
         args = parser.parse_args()
-        config_name = args.config
-        logging.info(f"using config {config_name}")
+        pipeconfig_name = args.pipeconfig
+        logging.info(f"using pipeconfig {pipeconfig_name}")
 
-        # Open the config file
+        # Open the pipeconfig file
 
-        config_path = f"{CONFIG_DIR}/{config_name}.json"
-        with open(config_path, "r") as file:
-            config = json.load(file)
-        logging.info(f"parsed config {config_name}")
+        pipeconfig_path = f"{PIPECONFIG_DIR}/{pipeconfig_name}.json"
+        with open(pipeconfig_path, "r") as file:
+            pipeconfig = json.load(file)
+        logging.info(f"parsed pipeconfig {pipeconfig_name}")
 
-        input_module_name = config["input"]["module"]
+        input_module_name = pipeconfig["input"]["module"]
         input_module = import_module(f"input.{input_module_name}")
         input_function = getattr(input_module, "get_feed_items")
 
@@ -44,12 +44,12 @@ def pyrsspipe():
             f"imported input module {input_module}, using input function {input_function}"
         )
 
-        feed_items = input_function(**config["input"]["args"], logger=logging)
+        feed_items = input_function(**pipeconfig["input"]["args"], logger=logging)
 
         feed_data = {
-            "feed_name": config["feed_name"],
-            "feed_filename": config["feed_filename"],
-            "feed_language": config["feed_language"],
+            "feed_name": pipeconfig["feed_name"],
+            "feed_filename": pipeconfig["feed_filename"],
+            "feed_language": pipeconfig["feed_language"],
             "items_data": feed_items,
         }
 
@@ -62,14 +62,14 @@ def pyrsspipe():
         feed_xml = make_feed_wrapper(feed_data)
         logging.info("feed_xml created")
 
-        output_module_name = config["output"]["module"]
+        output_module_name = pipeconfig["output"]["module"]
         output_module = import_module(f"output.{output_module_name}")
         output_function = getattr(output_module, "write_feed")
         logging.info(
             f"imported output module {output_module}, using output function {output_function}"
         )
 
-        output_function(feed_xml, **config["output"]["args"], logger=logging)
+        output_function(feed_xml, **pipeconfig["output"]["args"], logger=logging)
         logging.info("output complete")
 
         logging.info("pyrsspipe complete")
