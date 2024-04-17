@@ -6,14 +6,14 @@ def get_feed_items(feed_link, which_archive, logger):
     elif which_archive == 'Wayback Machine':
         substitute = 'https://web.archive.org/web/'
     elif which_archive == 'Google Webcache':
-        substitute = 'https://archive.today/'
+        substitute = 'https://webcache.googleusercontent.com/search?q=cache:'
 
     logger.info(f'parsing {feed_link}')
-    ftfeed = feedparser.parse(feed_link)
-    logger.info(f'found {len(ftfeed["entries"])} entries in {feed_link}')
+    feed = feedparser.parse(feed_link)
+    logger.info(f'found {len(feed["entries"])} entries in {feed_link}')
     feed_items = []
     
-    for entry in ftfeed['entries']:
+    for entry in feed['entries']:
         feed_item = {}
         feed_item['link'] = substitute + entry['link']
         feed_item['description'] = entry['summary']
