@@ -24,5 +24,5 @@ rfeed = "1.0.0"
 pytest = "^6.2.4"
 
 [tool.poetry.scripts]
-pyrsspipe = "pyrsspipe:pyrsspipe"
+pyrsspipe = "pyrsspipe.pyrsspipe:pyrsspipe"
 
