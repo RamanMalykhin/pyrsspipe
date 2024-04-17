@@ -22,8 +22,10 @@ try:
     logging.info(f'using config {config_name}')
 
     # Open the config file
+
+    config_dir = os.getenv('PRP_CONFIG_DIR_PATH') 
     
-    config_path = os.path.join(os.path.dirname(__file__), f"configs/{config_name}.json")
+    config_path = f'{config_dir}/{config_name}.json'
     with open(config_path, 'r') as file:
         config = json.load(file)
     logging.info(f'parsed config {config_name}')
