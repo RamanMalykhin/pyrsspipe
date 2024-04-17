@@ -7,8 +7,8 @@ from importlib import import_module
 from pyrsspipe.makefeed import make_feed_wrapper
 from pyrsspipe.validation import validate_feed_data
 
-CONFIG_DIR = os.getenv("PRP_CONFIG_DIR_PATH")
-LOG_DIR = os.getenv("PRP_LOG_DIR_PATH")
+CONFIG_DIR = os.getenv("PYRSSPIPE_CONFIG_DIR")
+LOG_DIR = os.getenv("PYRSSPIPE_LOG_DIR")
 
 
 def pyrsspipe():
