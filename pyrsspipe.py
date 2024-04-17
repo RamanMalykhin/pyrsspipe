@@ -57,7 +57,7 @@ try:
     output_module_name = config['output']['module']
     output_module = import_module(f"output.{output_module_name}")
     output_function = getattr(output_module, 'write_feed')
-    logging.info(f'imported output module {output_function}, using output function {output_function}')
+    logging.info(f'imported output module {output_module}, using output function {output_function}')
 
     output_function(feed_xml, **config['output']['args'], logger=logging)
     logging.info('output complete')
