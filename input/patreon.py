@@ -1,5 +1,7 @@
 import re
+
 import requests
+
 
 def get_feed_items(creator_name, logger):
     logger.info(f'starting pull for {creator_name}')

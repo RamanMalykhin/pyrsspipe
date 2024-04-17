@@ -1,5 +1,6 @@
-import feedparser
 import datetime
+
+import feedparser
 
 
 def get_feed_items(feed_link, logger):

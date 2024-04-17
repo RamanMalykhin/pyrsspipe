@@ -1,5 +1,6 @@
-import rfeed
 import datetime
+
+import rfeed
 
 
 def _make_rfeed_item(link, description, author=None, title=None):

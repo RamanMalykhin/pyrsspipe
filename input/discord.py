@@ -1,7 +1,9 @@
+import contextlib
+import os
+
 import requests
 from discord_markdown.discord_markdown import convert_to_html
-import os 
-import contextlib
+
 
 def get_feed_items(token, channel_id, guild_id, logger):
 
