@@ -6,6 +6,7 @@ def get_feed_items(page_url, article_items_xpath, item_title_xpath, item_content
     debug_mode = bool(debug_mode)
     response = requests.get(page_url)
     tree = lxml.html.fromstring(response.content)
+    tree.make_links_absolute(page_url)
 
     feed_items = []
     articles = tree.xpath(article_items_xpath)
