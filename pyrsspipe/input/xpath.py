@@ -1,8 +1,19 @@
 import lxml.html
 import requests
 import logging
+from pyrsspipe.input.base import AbstractInput
+from rfeed import Item, Feed, Guid
 
-def get_feed_items(page_url, article_items_xpath, item_title_xpath, item_content_xpath, item_url_xpath, debug_mode, logger):
+
+def get_feed_items(
+    page_url: str,
+    article_items_xpath: str,
+    item_title_xpath: str,
+    item_content_xpath: str,
+    item_url_xpath: str,
+    debug_mode: bool,
+    logger: logging.Logger,
+) -> Feed:
     debug_mode = bool(debug_mode)
     response = requests.get(page_url)
     tree = lxml.html.fromstring(response.content)
@@ -10,12 +21,12 @@ def get_feed_items(page_url, article_items_xpath, item_title_xpath, item_content
 
     feed_items = []
     articles = tree.xpath(article_items_xpath)
-    
+
     if debug_mode:
         logger.setLevel(logging.DEBUG)
 
     logger.debug(f"Scraped {len(articles)} items from {page_url}")
-    
+
     for article in articles:
         logger.debug(f"processing {article}")
 
@@ -31,7 +42,7 @@ def get_feed_items(page_url, article_items_xpath, item_title_xpath, item_content
         feed_item["description"] = content
         feed_item["link"] = url
         feed_items.append(feed_item)
-        
+
     if debug_mode:
         logger.setLevel(logging.INFO)
 

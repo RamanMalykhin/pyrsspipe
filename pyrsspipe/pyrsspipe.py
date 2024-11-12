@@ -15,7 +15,7 @@ def pyrsspipe():
     # Initialize logger
     logging.basicConfig(
         level=logging.INFO,
-        encoding='utf-8',
+        encoding="utf-8",
         format="%(asctime)s - %(levelname)s - %(message)s",
         handlers=[
             logging.FileHandler(os.path.join(log_dir, "pyrsspipe.log")),
@@ -26,7 +26,9 @@ def pyrsspipe():
 
     try:
         parser = argparse.ArgumentParser()
-        parser.add_argument("--pipeconfig", help="Specify the pipeconfig name", required=True)
+        parser.add_argument(
+            "--pipeconfig", help="Specify the pipeconfig name", required=True
+        )
         args = parser.parse_args()
         pipeconfig_name = args.pipeconfig
         logger.info(f"using pipeconfig {pipeconfig_name}")

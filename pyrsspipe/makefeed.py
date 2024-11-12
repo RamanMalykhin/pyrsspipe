@@ -20,7 +20,6 @@ def _make_rfeed_item(link, description, author=None, title=None):
 
 
 def _make_rfeed_feed(feed_items, feed_link, feed_name, feed_language):
-
     # create feed with passed items
     feed = rfeed.Feed(
         title=feed_name,

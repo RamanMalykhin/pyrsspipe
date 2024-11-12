@@ -14,7 +14,6 @@ def write_feed(
     if aws_access_key_id == "" and aws_secret_access_key == "" and endpoint_url == "":
         s3 = boto3.client("s3")
     else:
-
         s3 = boto3.client(
             "s3",
             aws_access_key_id=aws_access_key_id,
@@ -23,9 +22,11 @@ def write_feed(
         )
 
     response = s3.put_object(
-        Key=s3_key, Body=feed_xml, Bucket=s3_bucket, ContentType="application/xml", ACL = acl
-
+        Key=s3_key,
+        Body=feed_xml,
+        Bucket=s3_bucket,
+        ContentType="application/xml",
+        ACL=acl,
     )
     logger.info(f"boto3 put_object success. response: {response}")
     logger.info(f"written feed to s3://{s3_bucket}/{s3_key}")
-
