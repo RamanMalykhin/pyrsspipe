@@ -1,21 +1,23 @@
-def validate_feed_data(feed_data: dict):
-    _validate_feed_data(feed_data)
+# validation.py
 
-    for item_data in feed_data["items_data"]:
-        _validate_item_data(item_data)
+from pydantic import BaseModel, validator, ValidationError
+import importlib
 
+def import_module(module_name: str):
+    try:
+        module = importlib.import_module(module_name)
+        return module
+    except ImportError:
+        raise ValidationError(f"Module '{module_name}' could not be imported")
 
-def _validate_feed_data(feed_data):
-    for required in ["feed_language", "feed_name", "items_data"]:
-        if required not in feed_data:
-            raise ValueError(
-                f"feed_data must contain {required}. feed_data is {feed_data}"
-            )
+class ConfigModel(BaseModel):
+    input_module: str
+    output_module: str
 
-
-def _validate_item_data(item_data):
-    for required in ["link", "description"]:
-        if required not in item_data:
-            raise ValueError(
-                f"item_data must contain {required}. item_data is {item_data}"
-            )
+    @validator('input_module', 'output_module', pre=True)
+    def validate_and_import_module(cls, value):
+        module = import_module(value)
+        callable = getattr(module, 'execute', None)
+        if callable is None:
+            raise ValidationError(f"Module '{value}' does not contain 'execute' method")
+        cls.execute = callable
