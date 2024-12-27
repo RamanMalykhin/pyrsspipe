@@ -3,10 +3,15 @@ from logging import Logger
 import feedparser
 from rfeed import Feed, Item, Guid
 from pyrsspipe.input.base import AbstractInput
+from pydantic import BaseModel
 
 
 class DailyBufferInput(AbstractInput):
-    def execute(feed_link: str, logger: Logger) -> Feed:
+    def execute(logger: Logger, **kwargs) -> Feed:
+        feed_link = kwargs["feed_link"]
+
+
+
         input_feed = feedparser.parse(feed_link)
         feed_entries = input_feed["entries"]
         feed_entries.reverse()
@@ -64,3 +69,9 @@ class DailyBufferInput(AbstractInput):
         )
 
         return feed
+
+    @staticmethod
+    def get_validator():
+        class Validator(BaseModel):
+            feed_link: str
+        return Validator

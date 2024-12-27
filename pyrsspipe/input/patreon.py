@@ -1,11 +1,14 @@
-import re
 import requests
 from pyrsspipe.input.base import AbstractInput
 from rfeed import Item, Feed, Guid
+from pydantic import BaseModel
 
 
 class PatreonInput(AbstractInput):
-    def execute(campaign_id, logger):
+    @staticmethod
+    def execute(logger, **kwargs) -> Feed:
+        campaign_id = kwargs["campaign_id"]
+
         api_url = "https://www.patreon.com/api/posts"
         headers = {
             "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0",
@@ -35,4 +38,30 @@ class PatreonInput(AbstractInput):
                 posts_data.append(post_data)
 
         logger.info(f"finished pull for {campaign_id}")
-        return posts_data
+
+        feed_items = []
+        for post_data in posts_data:
+            feed_items.append(
+                Item(
+                    title=post_data["title"],
+                    link=post_data["link"],
+                    description=post_data["description"],
+                    author=post_data["author"],
+                    guid=Guid(post_data["link"]),
+                )
+            )
+
+        feed = Feed(
+            title="Patreon",
+            link="https://www.patreon.com",
+            description="",
+            language="en-US",
+            items=feed_items,
+        )
+        return feed
+
+    @staticmethod
+    def get_validator():
+        class Validator(BaseModel):
+            campaign_id: str
+        return Validator

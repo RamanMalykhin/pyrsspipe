@@ -1,18 +1,22 @@
 import boto3
 from pyrsspipe.output.base import AbstractOutput
 from logging import Logger
+from rfeed import Feed
 
 class S3Output(AbstractOutput):
+    @staticmethod
     def execute(
         logger: Logger,
-        feed_xml: str,
-        s3_bucket: str,
-        s3_key: str,
-        aws_access_key_id: str,
-        aws_secret_access_key: str,
-        endpoint_url: str,
-        acl: str,
+        feed: Feed,
+        **kwargs,
     ) -> None:
+        s3_bucket = kwargs["s3_bucket"]
+        s3_key = kwargs["s3_key"]
+        acl = kwargs["acl"]
+        aws_access_key_id = kwargs["aws_access_key_id"]
+        aws_secret_access_key = kwargs["aws_secret_access_key"]
+        endpoint_url = kwargs["endpoint_url"]
+
         if aws_access_key_id == "" and aws_secret_access_key == "" and endpoint_url == "":
             s3 = boto3.client("s3")
         else:
@@ -25,7 +29,7 @@ class S3Output(AbstractOutput):
 
         response = s3.put_object(
             Key=s3_key,
-            Body=feed_xml,
+            Body=feed.rss(),
             Bucket=s3_bucket,
             ContentType="application/xml",
             ACL=acl,

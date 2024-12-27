@@ -1,47 +1,58 @@
 
-from pydantic import BaseModel, validator, ValidationError
+from pydantic import BaseModel, field_validator
 import importlib
+from abc import ABC
 
-def import_module(module_name: str):
-    try:
-        module = importlib.import_module(module_name)
-        return module
-    except ImportError:
-        raise ValidationError(f"Module '{module_name}' could not be imported")
+def find_class_by_parent(base_class, module):
+    for name in dir(module):
+        obj = getattr(module, name)
+        if hasattr(obj, '__bases__') and base_class in obj.__bases__:
+            return obj
+    return None
+
+def validate_and_import_module(module_name: str, subpackage: str):
+        basemodule_cls = find_class_by_parent(ABC, importlib.import_module(f"pyrsspipe.{subpackage}.base"))
+        requestedmodule_cls = find_class_by_parent(basemodule_cls, importlib.import_module(f"pyrsspipe.{subpackage}.{module_name}"))
+
+        execute = getattr(requestedmodule_cls, 'execute', None)
+        validator_getter = getattr(requestedmodule_cls, 'get_validator', None)
+        validator = validator_getter() if callable(validator_getter) else None
+
+        if not callable(execute):
+            raise ValueError(f"Module '{module_name}' does not contain 'execute' attribute or it is not callable")
+        if not isinstance(validator, BaseModel):
+            raise ValueError(f"Module '{module_name}' does not contain 'get_validator' attribute, or it is not callable, or it does not return a pydantic Model")
+
+        return execute, validator
+
+
+class InputModuleModel(BaseModel):
+    module_name: str
+    args: dict
+
+    @field_validator('module_name', mode='after')
+    def validate_and_import_input_module(cls, module_name):
+        cls.execute, cls.validator = validate_and_import_module(module_name, 'input')
+
+    @field_validator('args', mode='after')
+    def validate_input_args(cls, args):
+        cls.validator.model_validate(**args)
+
+
+class OutputModuleModel(BaseModel):
+    module_name: str
+    args: dict
+
+    @field_validator('module_name', mode='after')
+    def validate_and_import_input_module(cls, module_name):
+        cls.execute, cls.validator = validate_and_import_module(module_name, 'output')
+
+    @field_validator('args', mode='after')
+    def validate_input_args(cls, args):
+        cls.validator.model_validate(**args)
 
 class ConfigModel(BaseModel):
     feed_name: str
     feed_language: str
-    input_module: dict
-    output_module: dict
-
-    @validator('input_module','output_module', pre=True)
-    def validate_and_import_module(cls, value):
-        module = import_module(value)
-        callable = getattr(module, 'execute', None)
-        if callable is None:
-            raise ValidationError(f"Module '{value}' does not contain 'execute' method")
-        cls.execute = callable
-    
-    @validator('input_module', 'output_module', pre=True)
-    def validate_args(cls, value):
-        mandatory = set()
-        optional = set()
-        
-        defined_args = inspect.signature(cls.execute).parameters
-        for arg in defined_args.values():
-            if arg.default == inspect._empty:
-                mandatory.add(arg.name)
-            else:
-                optional.add(arg.name)
-        
-        mandatory_missing = mandatory.difference(set(value['args'].keys()))
-        optional_missing = optional.difference(set(value['args'].keys()))
-        
-        if mandatory_missing:
-            raise ValueError(f'Missing mandatory arguments: {mandatory_missing}')
-        elif optional_missing:
-            for arg in optional_missing:
-                print(f"Optional argument {arg} missing. Default value {defined_args[arg].default} will be used")
-                
-        
+    input: InputModuleModel
+    output: OutputModuleModel

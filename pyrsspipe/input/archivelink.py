@@ -3,19 +3,24 @@ from pyrsspipe.input.base import AbstractInput
 from rfeed import Item, Feed
 from datetime import datetime
 from logging import Logger
-from typing import Literal
+from pydantic import BaseModel
 
 
 class ArchiveLinkInput(AbstractInput):
+    @staticmethod
     def execute(
         logger: Logger,
-        feed_link: str,
-        which_archive: Literal["archive.today", "Wayback Machine"],
-    ) -> Feed:
+        **kwargs    ) -> Feed:
+        which_archive = kwargs["which_archive"]
+        feed_link = kwargs["feed_link"]
+
+
         if which_archive == "archive.today":
             prefix = "https://archive.is/"
         elif which_archive == "Wayback Machine":
             prefix = "https://web.archive.org/web/"
+        else:
+            raise ValueError(f"Unknown or unsupported archive service: {which_archive}")
 
         logger.info(f"parsing {feed_link}")
         feed = feedparser.parse(feed_link)
@@ -38,8 +43,15 @@ class ArchiveLinkInput(AbstractInput):
             link=feed_link,
             description="",
             language=feed.language,
-            lastBuildDate=datetime.datetime.today(),
+            lastBuildDate=datetime.today(),
             items=feed_items,
         )
 
         return feed
+
+    @staticmethod
+    def get_validator():
+        class Validator(BaseModel):
+            which_archive: str
+            feed_link: str
+        return Validator

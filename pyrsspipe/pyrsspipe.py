@@ -4,8 +4,7 @@ import logging
 import os
 from importlib import import_module
 
-from pyrsspipe.makefeed import make_feed_wrapper
-from pyrsspipe.validation import validate_feed_data
+from pyrsspipe.validation import ConfigModel
 
 
 def pyrsspipe():
@@ -37,42 +36,19 @@ def pyrsspipe():
 
         pipeconfig_path = f"{pipeconfig_dir}/{pipeconfig_name}.json"
         with open(pipeconfig_path, "r") as file:
-            pipeconfig = json.load(file)
+            pipeconfig_raw = json.load(file)
+            pipeconfig = ConfigModel(**pipeconfig_raw)
+
         logger.info(f"parsed pipeconfig {pipeconfig_name}")
-
-        input_module_name = pipeconfig["input"]["module"]
-        input_module = import_module(f"pyrsspipe.input.{input_module_name}")
-        input_function = getattr(input_module, "get_feed_items")
-
         logger.info(
-            f"imported input module {input_module}, using input function {input_function}"
+            f"Using input module {pipeconfig.input.module_name}, output module {pipeconfig.output.module_name}"
         )
 
-        feed_items = input_function(**pipeconfig["input"]["args"], logger=logger)
+        feed = pipeconfig.input.execute(logger, **pipeconfig.input.args)
 
-        feed_data = {
-            "feed_name": pipeconfig["feed_name"],
-            "feed_language": pipeconfig["feed_language"],
-            "items_data": feed_items,
-        }
+        logger.info("feed created")
+        pipeconfig.output.execute(logger, feed, **pipeconfig.output.args)
 
-        try:
-            validate_feed_data(feed_data)
-        except ValueError as e:
-            logger.error(f"invalid feed_data: {e}")
-            raise e
-
-        feed_xml = make_feed_wrapper(feed_data)
-        logger.info("feed_xml created")
-
-        output_module_name = pipeconfig["output"]["module"]
-        output_module = import_module(f"pyrsspipe.output.{output_module_name}")
-        output_function = getattr(output_module, "write_feed")
-        logger.info(
-            f"imported output module {output_module}, using output function {output_function}"
-        )
-
-        output_function(feed_xml, **pipeconfig["output"]["args"], logger=logger)
         logger.info("output complete")
 
         logger.info("pyrsspipe complete")

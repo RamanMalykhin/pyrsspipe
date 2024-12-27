@@ -7,12 +7,17 @@ from rfeed import Item, Feed, Guid
 import dateutil.parser
 from datetime import datetime
 from logging import Logger
+from pydantic import BaseModel
 
 
 class DiscordInput(AbstractInput):
-    def execute(
-        token: str, channel_id: int, guild_id: int, title: str, logger: Logger
-    ) -> Feed:
+    @staticmethod
+    def execute(logger: Logger, **kwargs) -> Feed:
+        title = kwargs["title"]
+        token = kwargs["token"]
+        guild_id = kwargs["guild_id"]
+        channel_id = kwargs["channel_id"]
+
         discord_api_endpt = (
             f"https://discord.com/api/channels/{channel_id}/messages?limit=20"
         )
@@ -49,8 +54,17 @@ class DiscordInput(AbstractInput):
             link=discord_api_endpt,
             description="",
             language="en-US",
-            lastBuildDate=datetime.datetime.today(),
+            lastBuildDate=datetime.today(),
             items=feed_items,
         )
 
         return feed
+
+    @staticmethod
+    def get_validator():
+        class Validator(BaseModel):
+            title: str
+            token: str
+            guild_id: str
+            channel_id: str
+        return Validator
