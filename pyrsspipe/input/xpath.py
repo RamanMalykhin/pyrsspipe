@@ -1,38 +1,75 @@
+
 import lxml.html
 import requests
 import logging
+from pyrsspipe.input.base import AbstractInput
+from rfeed import Item, Feed, Guid
+from pydantic import BaseModel
 
-def get_feed_items(page_url, article_items_xpath, item_title_xpath, item_content_xpath, item_url_xpath, debug_mode, logger):
-    debug_mode = bool(debug_mode)
-    response = requests.get(page_url)
-    tree = lxml.html.fromstring(response.content)
-    tree.make_links_absolute(page_url)
 
-    feed_items = []
-    articles = tree.xpath(article_items_xpath)
-    
-    if debug_mode:
-        logger.setLevel(logging.DEBUG)
+class XPathInput(AbstractInput):
+    @staticmethod
+    def execute(logger: logging.Logger,**kwargs) -> Feed:
+        debug_mode = kwargs["debug_mode"]
+        page_url = kwargs["page_url"]
+        article_items_xpath = kwargs["article_items_xpath"]
+        item_title_xpath = kwargs["item_title_xpath"]
+        item_content_xpath = kwargs["item_content_xpath"]
+        item_url_xpath = kwargs["item_url_xpath"]
 
-    logger.debug(f"Scraped {len(articles)} items from {page_url}")
-    
-    for article in articles:
-        logger.debug(f"processing {article}")
+        debug_mode = bool(debug_mode)
+        response = requests.get(page_url)
+        tree = lxml.html.fromstring(response.content)
+        tree.make_links_absolute(page_url)
 
-        title = str(article.xpath(item_title_xpath)[0])
-        logger.debug(f"found title: {title}")
-        content = str(article.xpath(item_content_xpath)[0])
-        logger.debug(f"found content: {content}")
-        url = str(article.xpath(item_url_xpath)[0])
-        logger.debug(f"found url: {url}")
+        feed_items = []
+        articles = tree.xpath(article_items_xpath)
 
-        feed_item = {}
-        feed_item["title"] = title
-        feed_item["description"] = content
-        feed_item["link"] = url
-        feed_items.append(feed_item)
-        
-    if debug_mode:
-        logger.setLevel(logging.INFO)
+        if debug_mode:
+            logger.setLevel(logging.DEBUG)
 
-    return feed_items
+        logger.debug(f"Scraped {len(articles)} items from {page_url}")
+
+        for article in articles:
+            logger.debug(f"processing {article}")
+
+            title = str(article.xpath(item_title_xpath)[0])
+            logger.debug(f"found title: {title}")
+            content = str(article.xpath(item_content_xpath)[0])
+            logger.debug(f"found content: {content}")
+            url = str(article.xpath(item_url_xpath)[0])
+            logger.debug(f"found url: {url}")
+
+            feed_item = Item(
+                title=title,
+                link=url,
+                description=content,
+                author="placeholder",
+                guid=Guid(url),
+            )
+
+            feed_items.append(feed_item)
+
+        feed = Feed(
+            title="Feed",
+            link=page_url,
+            description="",
+            language="en-US",
+            items=feed_items,
+        )
+
+        if debug_mode:
+            logger.setLevel(logging.INFO)
+
+        return feed
+
+    @staticmethod
+    def get_validator():
+        class Validator(BaseModel):
+            debug_mode: bool
+            page_url: str
+            article_items_xpath: str
+            item_title_xpath: str
+            item_content_xpath: str
+            item_url_xpath: str
+        return Validator
