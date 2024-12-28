@@ -63,5 +63,5 @@ class PatreonInput(AbstractInput):
     @staticmethod
     def get_validator():
         class Validator(BaseModel):
-            campaign_id: str
+            campaign_id: int
         return Validator

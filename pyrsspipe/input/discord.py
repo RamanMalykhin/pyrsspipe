@@ -63,8 +63,7 @@ class DiscordInput(AbstractInput):
     @staticmethod
     def get_validator():
         class Validator(BaseModel):
-            title: str
             token: str
-            guild_id: str
-            channel_id: str
+            guild_id: int
+            channel_id: int
         return Validator

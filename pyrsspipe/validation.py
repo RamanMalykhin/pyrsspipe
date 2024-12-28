@@ -1,5 +1,5 @@
-
-from pydantic import BaseModel, field_validator
+from typing_extensions import Self
+from pydantic import BaseModel, model_validator, Extra
 import importlib
 from abc import ABC
 
@@ -20,36 +20,34 @@ def validate_and_import_module(module_name: str, subpackage: str):
 
         if not callable(execute):
             raise ValueError(f"Module '{module_name}' does not contain 'execute' attribute or it is not callable")
-        if not isinstance(validator, BaseModel):
+        if not issubclass(validator, BaseModel):
             raise ValueError(f"Module '{module_name}' does not contain 'get_validator' attribute, or it is not callable, or it does not return a pydantic Model")
 
         return execute, validator
 
 
-class InputModuleModel(BaseModel):
+class InputModuleModel(BaseModel, extra = 'allow'):
     module_name: str
     args: dict
 
-    @field_validator('module_name', mode='after')
-    def validate_and_import_input_module(cls, module_name):
-        cls.execute, cls.validator = validate_and_import_module(module_name, 'input')
+    @model_validator(mode='after')
+    def deep_validation(self) -> Self:
+        self.execute, validator = validate_and_import_module(self.module_name, 'input')
+        validator(**self.args)
 
-    @field_validator('args', mode='after')
-    def validate_input_args(cls, args):
-        cls.validator.model_validate(**args)
+        return self
 
-
-class OutputModuleModel(BaseModel):
+class OutputModuleModel(BaseModel, extra = 'allow'):
     module_name: str
     args: dict
 
-    @field_validator('module_name', mode='after')
-    def validate_and_import_input_module(cls, module_name):
-        cls.execute, cls.validator = validate_and_import_module(module_name, 'output')
+    @model_validator(mode='after')
+    def deep_validation(self) -> Self:
+        self.execute, validator = validate_and_import_module(self.module_name, 'output')
+        validator(**self.args)
 
-    @field_validator('args', mode='after')
-    def validate_input_args(cls, args):
-        cls.validator.model_validate(**args)
+        return self
+
 
 class ConfigModel(BaseModel):
     feed_name: str

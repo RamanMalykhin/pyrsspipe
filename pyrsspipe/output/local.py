@@ -9,16 +9,19 @@ class LocalOutput(AbstractOutput):
         output_dir = kwargs["output_dir"]
         file_name = kwargs["file_name"]
 
+        p = os.path.join(output_dir, file_name)
+        logger.info(f"writing feed to {p}")
+
         with open(os.path.join(output_dir, file_name), encoding="utf8", mode="w") as f:
             f.write(feed.rss())
 
     @staticmethod
     def get_validator():
         from pydantic import BaseModel
-        from pydantic import FilePath
+        from pydantic import DirectoryPath
 
         class LocalOutputModel(BaseModel):
-            output_dir: FilePath
+            output_dir: DirectoryPath
             file_name: str
 
         return LocalOutputModel
