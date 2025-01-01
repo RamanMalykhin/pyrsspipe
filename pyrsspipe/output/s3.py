@@ -4,7 +4,6 @@ from logging import Logger
 from rfeed import Feed
 
 class S3Output(AbstractOutput):
-
     @staticmethod
     def execute(
         logger: Logger,
@@ -37,19 +36,3 @@ class S3Output(AbstractOutput):
         )
         logger.info(f"boto3 put_object success. response: {response}")
         logger.info(f"written feed to s3://{s3_bucket}/{s3_key}")
-
-
-    @staticmethod
-    def get_validator():
-        from pydantic import BaseModel
-        from pydantic import AnyUrl
-
-        class S3OutputModel(BaseModel):
-            s3_bucket: str
-            s3_key: str
-            acl: str
-            aws_access_key_id: str
-            aws_secret_access_key: str
-            endpoint_url: AnyUrl
-
-        return S3OutputModel
