@@ -2,7 +2,6 @@ import argparse
 import json
 import logging
 import os
-from importlib import import_module
 
 from pyrsspipe.validation import ConfigModel
 
