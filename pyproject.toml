@@ -26,5 +26,5 @@ pydantic = "^2.10.3"
 pytest = "^6.2.4"
 
 [tool.poetry.scripts]
-pyrsspipe = "pyrsspipe.pyrsspipe:pyrsspipe"
-
+pyrsspipe-run = "pyrsspipe.pyrsspipe:pyrsspipe"
+pyrsspipe-create = "pyrsspipe.config_creator:create_pipeconfig"
