@@ -14,7 +14,7 @@ class DailyDigestInput(AbstractInput):
         input_feed = feedparser.parse(feed_link)
 
         # Parse the feed
-        feed = feedparser.parse('https://krytykapolityczna.pl/feed/')
+        feed = feedparser.parse(feed_link)
 
         # Group posts by day
         grouped_posts = defaultdict(list)
