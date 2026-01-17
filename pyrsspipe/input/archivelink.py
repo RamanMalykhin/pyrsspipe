@@ -54,4 +54,12 @@ class ArchiveLinkInput(AbstractInput):
         class Validator(BaseModel):
             which_archive: str
             feed_link: str
+
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "which_archive": "wayback",
+                        "feed_link": "https://example.com/rss"
+                    }
+                }
         return Validator

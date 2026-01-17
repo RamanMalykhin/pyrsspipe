@@ -1,10 +1,12 @@
 import os
 import json
-import importlib
+from pyrsspipe.validation import validate_and_import_module
 
 def get_validator(module_path):
-    module = importlib.import_module(module_path)
-    return module.get_validator()
+    subpackage, module_name = module_path.split(".")[-2:]
+    _, validator = validate_and_import_module(module_name, subpackage)
+    return validator
+
 
 def generate_example_config(input_module, output_module):
     input_validator = get_validator(f"pyrsspipe.input.{input_module}")
@@ -14,20 +16,22 @@ def generate_example_config(input_module, output_module):
     output_example = output_validator.schema().get("example", {})
 
     return {
+        "feed_name": "Example Feed",
+        "feed_language": "en-us",
         "input": {
-            "module": input_module,
-            "config": input_example
+            "module_name": input_module,
+            "args": input_example
         },
         "output": {
-            "module": output_module,
-            "config": output_example
+            "module_name": output_module,
+            "args": output_example
         }
     }
 
 def list_available_modules(directory):
     return [
         f[:-3] for f in os.listdir(directory)
-        if f.endswith(".py") and f != "__init__.py"
+        if f.endswith(".py") and f != "__init__.py" and f != "base.py"
     ]
 
 def create_pipeconfig():

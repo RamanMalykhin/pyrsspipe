@@ -1,4 +1,3 @@
-
 import lxml.html
 import requests
 import logging
@@ -72,4 +71,16 @@ class XPathInput(AbstractInput):
             item_title_xpath: str
             item_content_xpath: str
             item_url_xpath: str
+
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "debug_mode": False,
+                        "page_url": "https://example.com",
+                        "article_items_xpath": "//xpath/to/articles",
+                        "item_title_xpath": "./relative/xpath/to/title",
+                        "item_content_xpath": "./relative/xpath/to/content",
+                        "item_url_xpath": "./relative/xpath/to/url"
+                    }
+                }
         return Validator

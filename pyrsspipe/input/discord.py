@@ -66,4 +66,13 @@ class DiscordInput(AbstractInput):
             token_env_var: str
             guild_id: int
             channel_id: int
+
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "token_env_var": "DISCORD_TOKEN_ENV_VAR_NAME",
+                        "guild_id": 11111111111,
+                        "channel_id": 2222222222
+                    }
+                }
         return Validator
