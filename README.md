@@ -18,7 +18,7 @@ After installation, PyRSSPipe exposes a CLI command `pyrsspipe`, which takes one
 PyRSSPipe ships with some `input` and `output` modules that I built for my own use:
 - `input` modules:
     - `archivelink` takes an existing RSS feed and replaces links to posts with cached versions of these links.
-    - `dailybuffer` takes an existing RSS feed and creates a single feed item from all items in the feed that were published on the same day. This is useful for feeds that are based on chat-like applications (I use it for Telegram channels).
+    - `digest` takes an existing RSS feed and creates a single feed item from all items in the feed that were published within the same grouping period (daily, weekly, or monthly). This is useful for feeds that are based on chat-like applications (I use it for Telegram channels). It replaces the deprecated `dailybuffer` module.
     - `discord` creates an RSS feed from a Discord channel, using Discord's REST API.
     - `patreon` creates an RSS feed from a Patreon creator's posts, using Patreon's  REST API.
 - `output` modules:
@@ -58,4 +58,4 @@ PyRSSPipe ships with some `input` and `output` modules that I built for my own u
 ## Extending PyRSSPipe
 PyRSSPipe is inspired by the "ETL" concept. In PyRSSPipe, "Extract" and "Load" phases for data that is supposed to make it into an RSS feed are handled by `input` and `output` modules. 
 `input` modules are responsible for getting the data from whatever source. The "Transform" phase is universal and handled by the `makefeed` module, which creates an RSS feed from the data. `output` modules are responsible for writing that RSS feed to wherever. 
-To create a module, inherit from the `BaseInput` or `BaseOutput` class from `pyrsspipe.input` or `pyrsspipe.output` respectively, and implement the two abstract static methods - `execute` and `get_validator` (`get_validator` must return a Pydantic model that is used to verify the kwargs that will be passed to `execute` from the pipeconfig). 
+To create a module, inherit from the `BaseInput` or `BaseOutput` class from `pyrsspipe.input` or `pyrsspipe.output` respectively, and implement the two abstract static methods - `execute` and `get_validator` (`get_validator` must return a Pydantic model that is used to verify the kwargs that will be passed to `execute` from the pipeconfig).

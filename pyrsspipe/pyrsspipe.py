@@ -10,6 +10,12 @@ def pyrsspipe():
     pipeconfig_dir = os.getenv("PYRSSPIPE_PIPECONFIG_DIR")
     log_dir = os.getenv("PYRSSPIPE_LOG_DIR")
 
+    if not pipeconfig_dir or not log_dir:
+        raise EnvironmentError(
+            "Environment variables PYRSSPIPE_PIPECONFIG_DIR and PYRSSPIPE_LOG_DIR must be set."
+            f"As of now, PYRSSPIPE_PIPECONFIG_DIR is '{pipeconfig_dir}', and PYRSSPIPE_LOG_DIR is '{log_dir}'"
+        )
+
     # Initialize logger
     logging.basicConfig(
         level=logging.INFO,
