@@ -44,6 +44,9 @@ class DailyDigestInput(AbstractInput):
             grouped_posts[group].sort(key=lambda post: post.published_parsed, reverse=True)
 
         html_descriptions = {}
+        include_summaries = kwargs.get("include_summaries", True)  # Default to including summaries
+
+        # Include summaries in the grouped HTML content
         for group, posts in grouped_posts.items():
             html_content = f"<h2>Posts for {group}</h2><ul>"
             for post in posts:
@@ -51,7 +54,13 @@ class DailyDigestInput(AbstractInput):
                 title = post.get("title", "No Title")
                 link = post.get("link", "#")
                 published = post.get("published", "Unknown Date")
-                html_content += f"<li><strong>{title}</strong> by {author} (<a href='{link}'>link</a>) - Published: {published}</li>"
+                summary = post.get("summary_detail", {}).get("value", "No Summary")
+                html_content += (
+                    f"<li><strong>{title}</strong> by {author} (<a href='{link}'>link</a>) - Published: {published}"
+                )
+                if include_summaries:
+                    html_content += f"<br><em>Summary:</em> {summary}"
+                html_content += "</li>"
             html_content += "</ul>"
             html_descriptions[group] = html_content
 
@@ -78,4 +87,5 @@ class DailyDigestInput(AbstractInput):
         class Validator(BaseModel):
             feed_link: str
             grouping: str = "daily"  # Default to daily
+            include_summaries: bool = True  # Default to including summaries
         return Validator
