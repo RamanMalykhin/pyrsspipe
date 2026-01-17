@@ -10,31 +10,42 @@ class DailyDigestInput(AbstractInput):
     @staticmethod
     def execute(logger: Logger, **kwargs) -> Feed:
         feed_link = kwargs["feed_link"]
+        grouping = kwargs.get("grouping", "daily")  # Default to daily grouping
 
         input_feed = feedparser.parse(feed_link)
 
         # Parse the feed
         feed = feedparser.parse(feed_link)
 
-        # Group posts by day
+        # Group posts based on the specified grouping
         grouped_posts = defaultdict(list)
         for entry in feed.entries:
             if 'published_parsed' in entry:
-                # Convert published timestamp to date
                 published_date = datetime.date(
                     entry.published_parsed.tm_year,
                     entry.published_parsed.tm_mon,
                     entry.published_parsed.tm_mday,
                 )
-                grouped_posts[published_date].append(entry)
 
-        # Sort posts within each date by timestamp, from latest to earliest
-        for date in grouped_posts:
-            grouped_posts[date].sort(key=lambda post: post.published_parsed, reverse=True)
+                if grouping == "weekly":
+                    # Get the year and week number
+                    year, week, _ = published_date.isocalendar()
+                    group_key = f"{year}-W{week}"
+                elif grouping == "monthly":
+                    # Use year and month as the key
+                    group_key = f"{published_date.year}-{published_date.month}"
+                else:  # Default to daily
+                    group_key = published_date
+
+                grouped_posts[group_key].append(entry)
+
+        # Sort posts within each group by timestamp, from latest to earliest
+        for group in grouped_posts:
+            grouped_posts[group].sort(key=lambda post: post.published_parsed, reverse=True)
 
         html_descriptions = {}
-        for date, posts in grouped_posts.items():
-            html_content = f"<h2>Posts for {date}</h2><ul>"
+        for group, posts in grouped_posts.items():
+            html_content = f"<h2>Posts for {group}</h2><ul>"
             for post in posts:
                 author = post.get("author", "unknown@example.org")
                 title = post.get("title", "No Title")
@@ -42,21 +53,21 @@ class DailyDigestInput(AbstractInput):
                 published = post.get("published", "Unknown Date")
                 html_content += f"<li><strong>{title}</strong> by {author} (<a href='{link}'>link</a>) - Published: {published}</li>"
             html_content += "</ul>"
-            html_descriptions[date] = html_content
+            html_descriptions[group] = html_content
 
         feed_items = []
-        for date, html_content in html_descriptions.items():
+        for group, html_content in html_descriptions.items():
             feed_items.append(
                 Item(
-                    title=f"Daily Digest for {date}",
+                    title=f"{grouping.capitalize()} Digest for {group}",
                     description=html_content,
                     link=feed_link,
-                    guid=Guid(f"{feed_link}#{date}"),
+                    guid=Guid(f"{feed_link}#{group}"),
                     author='unknown@example.org'))
         output_feed = Feed(
-            title=f"Daily Digest Feed: {input_feed.feed.title}",
+            title=f"{grouping.capitalize()} Digest Feed: {input_feed.feed.title}",
             link=feed_link,
-            description=f"Daily Digest Feed generated from {input_feed.feed.title}",
+            description=f"{grouping.capitalize()} Digest Feed generated from {input_feed.feed.title}",
             language=input_feed.feed.get("language", "en-US"),
             items=feed_items,
         )
@@ -66,4 +77,5 @@ class DailyDigestInput(AbstractInput):
     def get_validator():
         class Validator(BaseModel):
             feed_link: str
+            grouping: str = "daily"  # Default to daily
         return Validator
