@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pyrsspipe"
-version = "10"
+version = "11"
 description = "A toolkit for working with RSS feeds"
 authors = ["Raman Malykhin"]
 packages = [

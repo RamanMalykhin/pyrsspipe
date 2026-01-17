@@ -24,4 +24,12 @@ class LocalOutput(AbstractOutput):
             output_dir: DirectoryPath
             file_name: str
 
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "output_dir": "/path/to/output",
+                        "file_name": "feed.xml"
+                    }
+                }
+
         return LocalOutputModel

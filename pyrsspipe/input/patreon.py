@@ -64,4 +64,11 @@ class PatreonInput(AbstractInput):
     def get_validator():
         class Validator(BaseModel):
             campaign_id: int
+
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "campaign_id": 123456
+                    }
+                }
         return Validator

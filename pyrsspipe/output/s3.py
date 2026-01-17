@@ -53,4 +53,16 @@ class S3Output(AbstractOutput):
             aws_secret_access_key_env_var: str
             endpoint_url_env_var: AnyUrl
 
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "s3_bucket": "example-bucket",
+                        "s3_key": "path/to/feed.xml",
+                        "acl": "public-read",
+                        "aws_access_key_id_env_var": "AWS_ACCESS_KEY_ID_ENV_VAR_NAME",
+                        "aws_secret_access_key_env_var": "AWS_SECRET_ACCESS_KEY_ENV_VAR_NAME",
+                        "endpoint_url_env_var": "https://s3.example.com"
+                    }
+                }
+
         return S3OutputModel

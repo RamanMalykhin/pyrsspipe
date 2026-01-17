@@ -88,4 +88,13 @@ class DailyDigestInput(AbstractInput):
             feed_link: str
             grouping: str = "daily"  # Default to daily
             include_summaries: bool = True  # Default to including summaries
+
+            class Config:
+                json_schema_extra = {
+                    "example": {
+                        "feed_link": "https://example.com/rss",
+                        "grouping": "daily",
+                        "include_summaries": True
+                    }
+                }
         return Validator
