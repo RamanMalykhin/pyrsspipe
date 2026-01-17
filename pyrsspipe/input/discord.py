@@ -14,7 +14,7 @@ class DiscordInput(AbstractInput):
     @staticmethod
     def execute(logger: Logger, **kwargs) -> Feed:
         title = kwargs["title"]
-        token = kwargs["token"]
+        token = os.getenv(kwargs["token_env_var"])
         guild_id = kwargs["guild_id"]
         channel_id = kwargs["channel_id"]
 
@@ -63,7 +63,7 @@ class DiscordInput(AbstractInput):
     @staticmethod
     def get_validator():
         class Validator(BaseModel):
-            token: str
+            token_env_var: str
             guild_id: int
             channel_id: int
         return Validator
