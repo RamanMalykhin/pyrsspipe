@@ -2,6 +2,7 @@ import boto3
 from pyrsspipe.output.base import AbstractOutput
 from logging import Logger
 from rfeed import Feed
+import os
 
 class S3Output(AbstractOutput):
 
@@ -14,9 +15,9 @@ class S3Output(AbstractOutput):
         s3_bucket = kwargs["s3_bucket"]
         s3_key = kwargs["s3_key"]
         acl = kwargs["acl"]
-        aws_access_key_id = kwargs["aws_access_key_id"]
-        aws_secret_access_key = kwargs["aws_secret_access_key"]
-        endpoint_url = kwargs["endpoint_url"]
+        aws_access_key_id = os.getenv(kwargs["aws_access_key_id_env_var"])
+        aws_secret_access_key = os.getenv(kwargs["aws_secret_access_key_env_var"])
+        endpoint_url = os.getenv(kwargs["endpoint_url_env_var"])
 
         if aws_access_key_id == "" and aws_secret_access_key == "" and endpoint_url == "":
             s3 = boto3.client("s3")
@@ -48,8 +49,8 @@ class S3Output(AbstractOutput):
             s3_bucket: str
             s3_key: str
             acl: str
-            aws_access_key_id: str
-            aws_secret_access_key: str
-            endpoint_url: AnyUrl
+            aws_access_key_id_env_var: str
+            aws_secret_access_key_env_var: str
+            endpoint_url_env_var: AnyUrl
 
         return S3OutputModel
