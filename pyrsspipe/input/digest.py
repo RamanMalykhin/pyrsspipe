@@ -17,6 +17,16 @@ class DailyDigestInput(AbstractInput):
         # Parse the feed
         feed = feedparser.parse(feed_link)
 
+        def build_group_key(date_obj):
+            if grouping == "weekly":
+                year, week, _ = date_obj.isocalendar()
+                return f"{year}-W{week}"
+            if grouping == "monthly":
+                return f"{date_obj.year}-{date_obj.month}"
+            return date_obj
+
+        current_period_key = build_group_key(datetime.date.today())
+
         # Group posts based on the specified grouping
         grouped_posts = defaultdict(list)
         for entry in feed.entries:
@@ -26,17 +36,9 @@ class DailyDigestInput(AbstractInput):
                     entry.published_parsed.tm_mon,
                     entry.published_parsed.tm_mday,
                 )
-
-                if grouping == "weekly":
-                    # Get the year and week number
-                    year, week, _ = published_date.isocalendar()
-                    group_key = f"{year}-W{week}"
-                elif grouping == "monthly":
-                    # Use year and month as the key
-                    group_key = f"{published_date.year}-{published_date.month}"
-                else:  # Default to daily
-                    group_key = published_date
-
+                group_key = build_group_key(published_date)
+                if group_key == current_period_key:
+                    continue
                 grouped_posts[group_key].append(entry)
 
         # Sort posts within each group by timestamp, from latest to earliest
