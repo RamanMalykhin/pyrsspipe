@@ -3,6 +3,8 @@ on:
   release:
     types:
       - published
+      - created
+      - edited
 
 jobs:
   build:
